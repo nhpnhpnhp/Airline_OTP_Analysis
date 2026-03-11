@@ -7,8 +7,7 @@
 
 **Đề tài**: Phân tích hiệu suất đúng giờ trong VTHK Hoa Kỳ tháng 1 (2021–2025) & Dự đoán trễ chuyến.
 
-**Dữ liệu**: BTS On-Time Reporting (transtats.bts.gov) — ~500K+ bản ghi, 5 năm × tháng 1.
-
+**Dữ liệu**: BTS On-Time Reporting (transtats.bts.gov) — ~2.500.000+ bản ghi, 5 năm × tháng 1.
 **Pipeline**:
 1. **Ingest**: Download CSV từ BTS → merge → parquet
 2. **Clean**: Handle cancelled/diverted, HHMM→minutes, time features
