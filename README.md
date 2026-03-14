@@ -58,7 +58,7 @@ airline-otp-analysis/
 
 ## 📊 Dữ liệu
 
-- **Nguồn**: [Bureau of Transportation Statistics (BTS)](https://www.transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=b0-gvzr&gnoyr_VQ=FGJ)
+- **Nguồn**: [Bureau of Transportation Statistics (BTS)](https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoession_VQ=FGJ&QO_fu146_guvf=D)
 - **Bảng**: On-Time Reporting Carrier On-Time Performance (1987–present)
 - **Phạm vi**: Tháng 1 (January) của 2021, 2022, 2023, 2024, 2025
 - **Quy mô**: ~500,000+ bản ghi
@@ -84,7 +84,7 @@ pip install -r requirements.txt
 Tham khảo hướng dẫn chi tiết trong `notebooks/01_data_ingestion.ipynb`
 
 **Cách 1 — Tải thủ công (UI):**
-1. Truy cập [BTS Download Page](https://www.transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=b0-gvzr&gnoyr_VQ=FGJ)
+1. Truy cập [BTS Download Page](https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoession_VQ=FGJ&QO_fu146_guvf=D)
 2. Chọn Year → Month = January → Download → Lưu vào `data/raw/`
 3. Lặp lại cho 2021–2025
 
