@@ -1,0 +1,214 @@
+{
+  "feature_names": [
+    "YEAR",
+    "DAY_OF_MONTH",
+    "DAY_OF_WEEK",
+    "IS_WEEKEND",
+    "CRS_DEP_TIME_MIN",
+    "CRS_ARR_TIME_MIN",
+    "CRS_DEP_SIN",
+    "CRS_DEP_COS",
+    "CRS_ARR_SIN",
+    "CRS_ARR_COS",
+    "CRS_ELAPSED_TIME",
+    "DISTANCE",
+    "DISTANCE_GROUP",
+    "OP_CARRIER_FREQ",
+    "CARRIER_HIST_OTP",
+    "ORIGIN_FREQ",
+    "ORIGIN_HIST_OTP",
+    "DEST_FREQ",
+    "ROUTE_FREQ",
+    "DEP_TIME_BLK_FREQ"
+  ],
+  "tree": {
+    "feature_index": 0,
+    "threshold": 2021.0,
+    "value": 0.25,
+    "gain": 0.006757944822311401,
+    "left": {
+      "feature_index": 1,
+      "threshold": 5.0,
+      "value": 0.12649910151958466,
+      "gain": 0.003018617630004883,
+      "left": {
+        "feature_index": 16,
+        "threshold": 0.7988941073417664,
+        "value": 0.20793060958385468,
+        "gain": 0.003769606351852417,
+        "left": {
+          "feature_index": null,
+          "threshold": null,
+          "value": 0.2633637487888336,
+          "gain": 0.0,
+          "left": null,
+          "right": null
+        },
+        "right": {
+          "feature_index": null,
+          "threshold": null,
+          "value": 0.17393042147159576,
+          "gain": 0.0,
+          "left": null,
+          "right": null
+        }
+      },
+      "right": {
+        "feature_index": 1,
+        "threshold": 22.0,
+        "value": 0.10796479880809784,
+        "gain": 0.0010042786598205566,
+        "left": {
+          "feature_index": 2,
+          "threshold": 3.0,
+          "value": 0.09166954457759857,
+          "gain": 0.0006408393383026123,
+          "left": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.0762048214673996,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.11238902062177658,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          }
+        },
+        "right": {
+          "feature_index": 14,
+          "threshold": 0.796635091304779,
+          "value": 0.13878017663955688,
+          "gain": 0.002134159207344055,
+          "left": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.19230769574642181,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.11884512007236481,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          }
+        }
+      }
+    },
+    "right": {
+      "feature_index": 6,
+      "threshold": 0.2588188946247101,
+      "value": 0.27735984325408936,
+      "gain": 0.0040073394775390625,
+      "left": {
+        "feature_index": 1,
+        "threshold": 17.0,
+        "value": 0.31013399362564087,
+        "gain": 0.005142718553543091,
+        "left": {
+          "feature_index": 14,
+          "threshold": 0.7616881132125854,
+          "value": 0.3564685881137848,
+          "gain": 0.0028786957263946533,
+          "left": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.4542662799358368,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.341750830411911,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          }
+        },
+        "right": {
+          "feature_index": 0,
+          "threshold": 2022.0,
+          "value": 0.2546391785144806,
+          "gain": 0.0032840371131896973,
+          "left": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.19583778083324432,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.28256461024284363,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          }
+        }
+      },
+      "right": {
+        "feature_index": 13,
+        "threshold": 0.13093887269496918,
+        "value": 0.2162233144044876,
+        "gain": 0.002509862184524536,
+        "left": {
+          "feature_index": 16,
+          "threshold": 0.7404021620750427,
+          "value": 0.2414141446352005,
+          "gain": 0.0016586780548095703,
+          "left": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.3473818600177765,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.23358799517154694,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          }
+        },
+        "right": {
+          "feature_index": 1,
+          "threshold": 17.0,
+          "value": 0.16640610992908478,
+          "gain": 0.003610551357269287,
+          "left": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.205263152718544,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "feature_index": null,
+            "threshold": null,
+            "value": 0.11994660645723343,
+            "gain": 0.0,
+            "left": null,
+            "right": null
+          }
+        }
+      }
+    }
+  }
+}

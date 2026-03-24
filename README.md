@@ -4,16 +4,17 @@ Project mon hoc Phan tich du lieu ve On-Time Performance cua van tai hang khong 
 
 ## Pham vi hien tai
 
-Project hien dang tap trung vao 3 phan da co bang chung thuc thi:
+Project hien dang tap trung vao 4 phan da co bang chung thuc thi:
 
 - Thu thap va to chuc du lieu raw BTS cho 2021-2025
 - Tien xu ly va lam sach du lieu thanh cac tap parquet phan vung
 - Exploratory analysis va risk analysis, da sinh ra hinh trong `reports/figures/`
+- Statistical analysis va predictive modeling cho Track A, da sinh ra artifact trong `reports/track_a/`
 
 Nhung phan chua duoc xem la hoan thien trong repo hien tai:
 
-- Modeling / huan luyen mo hinh
-- Danh gia mo hinh
+- Track B modeling
+- Cross-track comparison Track A vs Track B
 - Dashboard
 - Slide bao cao cuoi cung
 
@@ -58,6 +59,7 @@ Airline_OTP_Analysis/
 - File chinh thuc dat trong `src/`
 - Notebook exploratory dat trong `archive/exploratory/`
 - Output phan tich dat trong `reports/figures/`
+- Output modeling Track A dat trong `reports/track_a/`
 - Khong giu file debug ca nhan, file cache, hoac notebook ML chua thuc hien trong luong chinh
 
 ## Du lieu
@@ -91,7 +93,35 @@ Neu can xem cac notebook phan tich thu nghiem:
 - `archive/exploratory/delay_analysis.ipynb`
 - `archive/exploratory/risk_analysis.ipynb`
 
+Track A modeling branch hien da co statistical analysis, evaluation artifact va report rieng trong `reports/track_a/`.
+
+## Track A workflow
+
+Run the Track A analysis and modeling workflow:
+
+```bash
+python -m src.track_a.main
+```
+
+Main outputs:
+
+- `reports/track_a/track_a_final_report.md`
+- `reports/track_a/track_a_slide_deck.md`
+- `reports/track_a/track_b_dependency_report.md`
+- `reports/track_a/model_comparison.csv`
+- `reports/track_a/statistical_tests.csv`
+- `reports/track_a/figures/`
+- `reports/track_a/models/`
+
+## Current Track A model comparison
+
+| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6099 | 0.2633 | 0.2310 | 0.6657 | 0.3430 | 0.4400 | 65329 | 206655 | 217484 | 32801 |
+| Decision Tree | 0.5945 | 0.2278 | 0.2096 | 0.7354 | 0.3263 | 0.2400 | 72168 | 152072 | 272067 | 25962 |
+
 ## Luu y
 
-- Thu muc `models/` va `dashboard/` da duoc loai khoi luong chinh vi chua co artifact hoan chinh.
+- Thu muc `dashboard/` van chua duoc dua vao luong chinh.
 - Cac file notebook cu cho feature engineering / modeling da duoc xoa de tranh conflict voi huong phat trien sau nay.
+- Track A da co workflow rieng trong `src/track_a/`; Track B chua duoc xem la phan da hoan thien.

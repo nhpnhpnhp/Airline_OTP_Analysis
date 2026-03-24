@@ -8,11 +8,12 @@ Phien ban repo hien tai duoc chot scope nhu sau:
 2. Tao processed datasets va quality report
 3. Gom EDA thanh notebook exploratory
 4. Giu cac notebook phan tich thu nghiem trong `archive/exploratory/`
+5. Hoan thien nhanh Track A voi statistical analysis + predictive modeling toi gian
 
 Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
 - Feature engineering notebook theo huong cu
-- Modeling / evaluation
+- Track B modeling / cross-track comparison day du
 - Dashboard
 - Slide deck
 
@@ -21,6 +22,7 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 - Giu `src/step1_data_cleaning/main.py` lam diem vao preprocessing chinh
 - Gop nhom EDA script cu thanh `archive/exploratory/eda_overview.ipynb`
 - Chuyen `delay_analysis.ipynb` va `risk_analysis.ipynb` thanh notebook exploratory
+- Bo sung `src/track_a/` lam workflow rieng cho statistical analysis + modeling cua Track A
 - Xoa notebook cu va cac file source ML/dashboard chua thuc hien
 
 ## Checklist uu tien tiep theo
@@ -33,12 +35,13 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 - [x] Co notebook exploratory tong hop cho EDA
 - [x] Tach notebook exploratory khoi source chinh
 - [x] Xoa file stale / conflict-prone
+- [x] Co workflow Track A rieng va artifact modeling trong `reports/track_a/`
 
 ### Viec nen lam tiep
 
 - [ ] Chuan hoa them naming cho hinh exploratory trong `reports/figures/`
 - [ ] Viet bao cao thuc te dua tren artifact hien co
-- [ ] Neu bat dau modeling lai, tao module moi tu dau theo cau truc moi
+- [ ] Hoan thien report / slide / README final dua tren Track A artifact
 - [ ] Neu bat dau dashboard lai, tao code moi tu output hien co thay vi tai su dung skeleton cu
 
 ## Quy uoc to chuc file
@@ -51,4 +54,4 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
 ## Ghi chu
 
-`data/processed/ml_track_a/` va `data/processed/ml_track_b/` hien la artifact preprocessing da duoc tao ra truoc do. Chung khong duoc xem la bang chung rang phan modeling da hoan thanh.
+`data/processed/ml_track_a/` va `data/processed/ml_track_b/` la artifact preprocessing. Trong phien ban hien tai, Track A da co them workflow modeling rieng trong `src/track_a/`, con Track B van chua duoc xem la da hoan thanh.

@@ -1,0 +1,3 @@
+test,statistic,p_value,degrees_of_freedom,effect_size,effect_name,n
+Chi-square YEAR vs ARR_DEL15,31026.823307723087,0.0,4,0.11286737831957526,Cramers V,2435569
+Kruskal-Wallis ARR_DELAY_NEW by DEP_TIME_BLK,21825.105589697127,0.0,18,0.008953667791544877,Epsilon squared,2435569
