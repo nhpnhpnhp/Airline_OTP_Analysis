@@ -1,124 +1,97 @@
-# ✈️ Phân tích hiệu suất đúng giờ trong vận tải hàng không Hoa Kỳ (Tháng 1, 2021–2025) & Dự đoán trễ chuyến
+# Airline OTP Analysis
 
-> **Đồ án môn Phân tích dữ liệu** — End-to-end Data Analytics & Machine Learning Project
+Project mon hoc Phan tich du lieu ve On-Time Performance cua van tai hang khong Hoa Ky trong thang 1 giai doan 2021-2025.
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Data](https://img.shields.io/badge/Data-BTS%20Transtats-orange)
+## Pham vi hien tai
 
----
+Project hien dang tap trung vao 3 phan da co bang chung thuc thi:
 
-## 📋 Mục tiêu
+- Thu thap va to chuc du lieu raw BTS cho 2021-2025
+- Tien xu ly va lam sach du lieu thanh cac tap parquet phan vung
+- Exploratory analysis va risk analysis, da sinh ra hinh trong `reports/figures/`
 
-| # | Mục tiêu | Mô tả |
-|---|---------|--------|
-| 1 | **OTP Analysis** | Đo lường & phân tích On-Time Performance theo năm, hãng bay, sân bay, tuyến, khung giờ |
-| 2 | **Delay Decomposition** | Phân rã nguyên nhân trễ (Carrier / Weather / NAS / Security / Late Aircraft) |
-| 3 | **Risk Analysis** | Phân tích chuyến bị hủy (Cancelled) và chuyển hướng (Diverted) |
-| 4 | **Delay Prediction** | Xây dựng mô hình ML dự đoán trễ chuyến (Track A: pre-flight, Track B: post-pushback) |
-| 5 | **Dashboard** | Streamlit dashboard tương tác với KPI, biểu đồ, và demo prediction |
+Nhung phan chua duoc xem la hoan thien trong repo hien tai:
 
-## 📂 Cấu trúc dự án
+- Modeling / huan luyen mo hinh
+- Danh gia mo hinh
+- Dashboard
+- Slide bao cao cuoi cung
 
-```
-airline-otp-analysis/
-├── README.md                          # Mô tả dự án (file này)
-├── requirements.txt                   # Dependencies
-├── .gitignore
-│
+## Cau truc hien tai
+
+```text
+Airline_OTP_Analysis/
+├── archive/
+│   └── exploratory/
+│       ├── eda_overview.ipynb
+│       ├── delay_analysis.ipynb
+│       └── risk_analysis.ipynb
 ├── data/
-│   ├── raw/                           # CSV gốc từ BTS (KHÔNG commit)
-│   └── processed/                     # Parquet đã xử lý
-│
-├── notebooks/
-│   ├── 01_data_ingestion.ipynb        # Tải & merge dữ liệu
-│   ├── 02_cleaning_eda.ipynb          # Cleaning + EDA + Visualization
-│   ├── 03_feature_engineering.ipynb   # Feature engineering cho ML
-│   ├── 04_model_trackA.ipynb          # Track A: Pre-flight prediction
-│   └── 05_model_trackB.ipynb         # Track B: Post-pushback prediction
-│
+│   ├── raw/
+│   └── processed/
+│       ├── clean_full/
+│       ├── clean_operated/
+│       ├── mappings/
+│       ├── ml_track_a/
+│       └── ml_track_b/
+├── reports/
+│   ├── figures/
+│   ├── quality_report.md
+│   └── report_outline.md
 ├── src/
-│   ├── __init__.py
-│   ├── data_loader.py                 # Load & merge raw data
-│   ├── cleaner.py                     # Data cleaning pipeline
-│   ├── features.py                    # Feature engineering
-│   ├── train.py                       # Model training utilities
-│   └── evaluate.py                    # Evaluation metrics & plots
-│
-├── models/                            # Saved models (.joblib)
-│
-├── dashboard/
-│   └── app.py                         # Streamlit dashboard
-│
-└── reports/
-    ├── figures/                        # Exported charts
-    ├── report_outline.md              # Cấu trúc báo cáo
-    └── slide_outline.md               # Cấu trúc slide
+│   └── step1_data_cleaning/
+│       ├── main.py
+│       ├── pipeline.py
+│       ├── transformations.py
+│       ├── reporting.py
+│       ├── ml_preparation.py
+│       ├── ml_config.py
+│       ├── utils.py
+│       └── config.py
+├── PROJECT_GUIDE.md
+├── README.md
+└── requirements.txt
 ```
 
-## 📊 Dữ liệu
+## Quy uoc to chuc
 
-- **Nguồn**: [Bureau of Transportation Statistics (BTS)](https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoession_VQ=FGJ&QO_fu146_guvf=D)
-- **Bảng**: On-Time Reporting Carrier On-Time Performance (1987–present)
-- **Phạm vi**: Tháng 1 (January) của 2021, 2022, 2023, 2024, 2025
-- **Quy mô**: ~500,000+ bản ghi
-- **Định nghĩa OTP**: Chuyến bay đúng giờ nếu `ARR_DELAY ≤ 15 phút` (hoặc `ARR_DEL15 = 0`)
+- File chinh thuc dat trong `src/`
+- Notebook exploratory dat trong `archive/exploratory/`
+- Output phan tich dat trong `reports/figures/`
+- Khong giu file debug ca nhan, file cache, hoac notebook ML chua thuc hien trong luong chinh
 
-## 🚀 Cài đặt & Chạy
+## Du lieu
 
-### 1. Clone repo
+- Nguon: Bureau of Transportation Statistics (BTS)
+- Tap raw hien co: `data/raw/T_ONTIME_REPORTING_2021.csv` den `data/raw/T_ONTIME_REPORTING_2025.csv`
+- Bao cao chat luong preprocessing: `reports/quality_report.md`
+
+## Luong chay de xuat
+
+### 1. Preprocessing
+
 ```bash
-git clone <repo-url>
-cd airline-otp-analysis
+python -m src.step1_data_cleaning.main
 ```
 
-### 2. Tạo virtual environment
-```bash
-python -m venv venv
-source venv/bin/activate        # Linux/Mac
-venv\Scripts\activate           # Windows
-pip install -r requirements.txt
-```
+Output chinh:
 
-### 3. Tải dữ liệu
-Tham khảo hướng dẫn chi tiết trong `notebooks/01_data_ingestion.ipynb`
+- `data/processed/clean_full/`
+- `data/processed/clean_operated/`
+- `data/processed/mappings/`
+- `data/processed/ml_track_a/`
+- `data/processed/ml_track_b/`
+- `reports/quality_report.md`
 
-**Cách 1 — Tải thủ công (UI):**
-1. Truy cập [BTS Download Page](https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoession_VQ=FGJ&QO_fu146_guvf=D)
-2. Chọn Year → Month = January → Download → Lưu vào `data/raw/`
-3. Lặp lại cho 2021–2025
+### 2. Exploratory notebooks
 
-**Cách 2 — Script tự động:**
-```bash
-python src/data_loader.py
-```
+Neu can xem cac notebook phan tich thu nghiem:
 
-### 4. Chạy notebooks
-Mở lần lượt các notebook trong `notebooks/` trên Jupyter / Google Colab.
+- `archive/exploratory/eda_overview.ipynb`
+- `archive/exploratory/delay_analysis.ipynb`
+- `archive/exploratory/risk_analysis.ipynb`
 
-### 5. Chạy dashboard
-```bash
-streamlit run dashboard/app.py
-```
+## Luu y
 
-## 🤖 Modeling
-
-| Track | Mô tả | Features | Target |
-|-------|--------|----------|--------|
-| **A** | Pre-flight (trước giờ bay) | Carrier, Origin, Dest, CRS times, Distance, Day of week, Year... | `ARR_DEL15` |
-| **B** | Post-pushback (sau pushback) | Tất cả Track A + DEP_DELAY, DEP_DEL15, TAXI_OUT... | `ARR_DEL15` |
-
-### Mô hình so sánh
-1. **Logistic Regression** (Baseline)
-2. **Random Forest**
-3. **XGBoost** / LightGBM
-
-### Đánh giá
-- ROC-AUC, PR-AUC, F1-score
-- Confusion Matrix
-- Temporal validation: Train 2021–2024, Test 2025
-- SHAP / Permutation Importance
-
-## 📝 License
-
-MIT License — Free for academic use.
+- Thu muc `models/` va `dashboard/` da duoc loai khoi luong chinh vi chua co artifact hoan chinh.
+- Cac file notebook cu cho feature engineering / modeling da duoc xoa de tranh conflict voi huong phat trien sau nay.
