@@ -1,74 +1,49 @@
 # Airline OTP Analysis
 
-Project mon hoc Phan tich du lieu ve On-Time Performance cua van tai hang khong Hoa Ky trong thang 1 giai doan 2021-2025.
+Project mon hoc phan tich du lieu On-Time Performance cua van tai hang khong Hoa Ky trong thang 1 giai doan 2021-2025.
 
 ## Pham vi hien tai
 
-Project hien dang tap trung vao 4 phan da co bang chung thuc thi:
+Repo hien tap trung vao 4 phan da co artifact ro rang:
 
 - Thu thap va to chuc du lieu raw BTS cho 2021-2025
 - Tien xu ly va lam sach du lieu thanh cac tap parquet phan vung
-- Exploratory analysis va risk analysis, da sinh ra hinh trong `reports/figures/`
-- Statistical analysis va predictive modeling cho Track A, da sinh ra artifact trong `reports/track_a/`
+- Exploratory analysis va risk analysis trong `archive/exploratory/`
+- Statistical analysis va predictive modeling cho Track A trong `src/track_a/`, sinh artifact vao `reports/track_a/`
 
-Nhung phan chua duoc xem la hoan thien trong repo hien tai:
+Nhung phan chua duoc xem la hoan thien:
 
 - Track B modeling
 - Cross-track comparison Track A vs Track B
 - Dashboard
-- Slide bao cao cuoi cung
+- Final presentation version
 
-## Cau truc hien tai
+## Cau truc repo
 
 ```text
 Airline_OTP_Analysis/
-├── archive/
-│   └── exploratory/
-│       ├── eda_overview.ipynb
-│       ├── delay_analysis.ipynb
-│       └── risk_analysis.ipynb
-├── data/
-│   ├── raw/
-│   └── processed/
-│       ├── clean_full/
-│       ├── clean_operated/
-│       ├── mappings/
-│       ├── ml_track_a/
-│       └── ml_track_b/
-├── reports/
-│   ├── figures/
-│   ├── quality_report.md
-│   └── report_outline.md
-├── src/
-│   └── step1_data_cleaning/
-│       ├── main.py
-│       ├── pipeline.py
-│       ├── transformations.py
-│       ├── reporting.py
-│       ├── ml_preparation.py
-│       ├── ml_config.py
-│       ├── utils.py
-│       └── config.py
-├── PROJECT_GUIDE.md
-├── README.md
-└── requirements.txt
+|-- archive/
+|   `-- exploratory/
+|-- data/
+|   |-- raw/
+|   `-- processed/
+|       |-- clean_full/
+|       |-- clean_operated/
+|       |-- mappings/
+|       |-- ml_track_a/
+|       `-- ml_track_b/
+|-- reports/
+|   |-- figures/
+|   `-- track_a/
+|-- src/
+|   |-- step1_data_cleaning/
+|   `-- track_a/
+|-- PROJECT_GUIDE.md
+|-- README.md
+`-- requirements.txt
 ```
 
-## Quy uoc to chuc
-
-- File chinh thuc dat trong `src/`
-- Notebook exploratory dat trong `archive/exploratory/`
-- Output phan tich dat trong `reports/figures/`
-- Output modeling Track A dat trong `reports/track_a/`
-- Khong giu file debug ca nhan, file cache, hoac notebook ML chua thuc hien trong luong chinh
-
-## Du lieu
-
-- Nguon: Bureau of Transportation Statistics (BTS)
-- Tap raw hien co: `data/raw/T_ONTIME_REPORTING_2021.csv` den `data/raw/T_ONTIME_REPORTING_2025.csv`
-- Bao cao chat luong preprocessing: `reports/quality_report.md`
-
-## Luong chay de xuat
+## Luong chay chinh
 
 ### 1. Preprocessing
 
@@ -85,25 +60,52 @@ Output chinh:
 - `data/processed/ml_track_b/`
 - `reports/quality_report.md`
 
-### 2. Exploratory notebooks
-
-Neu can xem cac notebook phan tich thu nghiem:
-
-- `archive/exploratory/eda_overview.ipynb`
-- `archive/exploratory/delay_analysis.ipynb`
-- `archive/exploratory/risk_analysis.ipynb`
-
-Track A modeling branch hien da co statistical analysis, evaluation artifact va report rieng trong `reports/track_a/`.
-
-## Track A workflow
-
-Run the Track A analysis and modeling workflow:
+### 2. Track A workflow
 
 ```bash
 python -m src.track_a.main
 ```
 
+Workflow nay hien:
+
+- Doc du lieu Track A da duoc preprocessing
+- Chay statistical tests cho cac bien phan tich
+- Train va danh gia `LogisticRegression`, `RandomForestClassifier`, `GradientBoostingClassifier`
+- Tinh metric va ve figure bang `scikit-learn`
+- Chay statistical tests bang `scipy`
+- Sinh report, slide markdown va model artifact vao `reports/track_a/`
+
 Main outputs:
+
+- `reports/track_a/track_a_final_report.md`
+- `reports/track_a/track_a_slide_deck.md`
+- `reports/track_a/track_b_dependency_report.md`
+- `reports/track_a/model_comparison.csv`
+- `reports/track_a/permutation_importance.csv`
+- `reports/track_a/statistical_tests.csv`
+- `reports/track_a/figures/`
+- `reports/track_a/models/`
+
+## Current Track A model comparison
+
+| model | roc_auc | pr_auc | accuracy | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6165 | 0.2697 | 0.2190 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18199 | 405940 | 1939 |
+| Gradient Boosting | 0.6020 | 0.2416 | 0.4379 | 0.2187 | 0.7743 | 0.3411 | 0.2000 | 75978 | 152719 | 271420 | 22152 |
+| Random Forest | 0.5980 | 0.2490 | 0.4522 | 0.2179 | 0.7395 | 0.3366 | 0.5000 | 72566 | 163607 | 260532 | 25564 |
+
+- Track A hiện có workflow mô hình hóa riêng cùng các artifact thống kê và đánh giá
+- Bộ output mới nhất của Track A nằm trong `reports/track_a/` và `reports/track_a/models/`
+
+## Workflow Track A
+
+Chạy workflow phân tích và mô hình hóa của Track A:
+
+```bash
+python -m src.track_a.main
+```
+
+Các đầu ra chính:
 
 - `reports/track_a/track_a_final_report.md`
 - `reports/track_a/track_a_slide_deck.md`
@@ -113,15 +115,48 @@ Main outputs:
 - `reports/track_a/figures/`
 - `reports/track_a/models/`
 
-## Current Track A model comparison
+## Bảng so sánh mô hình Track A hiện tại
 
-| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Logistic Regression | 0.6099 | 0.2633 | 0.2310 | 0.6657 | 0.3430 | 0.4400 | 65329 | 206655 | 217484 | 32801 |
-| Random Forest Lite | 0.5911 | 0.2438 | 0.2092 | 0.7960 | 0.3313 | 0.3200 | 78113 | 128858 | 295281 | 20017 |
-| Logistic Regression | 0.6099 | 0.2633 | 0.2310 | 0.6657 | 0.3430 | 0.4400 | 65329 | 206655 | 217484 | 32801 |
-| Random Forest Lite | 0.5911 | 0.2438 | 0.2092 | 0.7960 | 0.3313 | 0.3200 | 78113 | 128858 | 295281 | 20017 |
-| Gradient Boosting Lite | 0.5845 | 0.2259 | 0.2003 | 0.8627 | 0.3251 | 0.2800 | 84654 | 86144 | 337995 | 13476 |
+| model | roc_auc | pr_auc | accuracy | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6165 | 0.2698 | 0.2190 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18186 | 405953 | 1939 |
+| Gradient Boosting | 0.6010 | 0.2512 | 0.4122 | 0.2134 | 0.7922 | 0.3362 | 0.2000 | 77739 | 137555 | 286584 | 20391 |
+| Random Forest | 0.5959 | 0.2455 | 0.4519 | 0.2174 | 0.7376 | 0.3358 | 0.5000 | 72376 | 163630 | 260509 | 25754 |
+
+- Track A hiện có workflow mô hình hóa riêng cùng các artifact thống kê và đánh giá
+- Bộ output mới nhất của Track A nằm trong `reports/track_a/` và `reports/track_a/models/`
+
+## Workflow Track A
+
+Chạy workflow phân tích và mô hình hóa của Track A:
+
+```bash
+python -m src.track_a.main
+```
+
+Các đầu ra chính:
+
+- `reports/track_a/track_a_final_report.md`
+- `reports/track_a/track_a_slide_deck.md`
+- `reports/track_a/track_b_dependency_report.md`
+- `reports/track_a/model_comparison.csv`
+- `reports/track_a/statistical_tests.csv`
+- `reports/track_a/figures/`
+- `reports/track_a/models/`
+
+## Bảng so sánh mô hình Track A hiện tại
+
+| model | roc_auc | pr_auc | accuracy | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6165 | 0.2698 | 0.2190 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18186 | 405953 | 1939 |
+| Gradient Boosting | 0.6010 | 0.2512 | 0.4122 | 0.2134 | 0.7922 | 0.3362 | 0.2000 | 77739 | 137555 | 286584 | 20391 |
+| Random Forest | 0.5959 | 0.2455 | 0.4519 | 0.2174 | 0.7376 | 0.3358 | 0.5000 | 72376 | 163630 | 260509 | 25754 |
+
+## Ghi chú
+
+- Exploratory notebooks duoc giu trong `archive/exploratory/` thay vi nam trong luong source chinh.
+- Track A da co workflow rieng trong `src/track_a/` va dang la nhanh modeling hoan chinh nhat cua repo.
+- Track B hien chi moi dung o muc artifact preprocessing, chua duoc xem la workflow modeling da hoan tat.
 
 - Track A modeling branch with statistical analysis and evaluation artifacts
 - Best available Track A workflow outputs in `reports/track_a/` and `reports/track_a/models/`
@@ -146,43 +181,8 @@ Main outputs:
 
 ## Current Track A model comparison
 
-| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Logistic Regression | 0.6130 | 0.2660 | 0.1897 | 0.9918 | 0.3185 | 0.4600 | 97328 | 8384 | 415755 | 802 |
-| Random Forest Lite | 0.5942 | 0.2462 | 0.2211 | 0.6946 | 0.3354 | 0.3600 | 68162 | 184005 | 240134 | 29968 |
-| Gradient Boosting Lite | 0.5876 | 0.2388 | 0.2004 | 0.8693 | 0.3257 | 0.2800 | 85308 | 83748 | 340391 | 12822 |
-
-- Track A modeling branch with statistical analysis and evaluation artifacts
-- Best available Track A workflow outputs in `reports/track_a/` and `reports/track_a/models/`
-
-## Track A workflow
-
-Run the Track A analysis and modeling workflow:
-
-```bash
-python -m src.track_a.main
-```
-
-Main outputs:
-
-- `reports/track_a/track_a_final_report.md`
-- `reports/track_a/track_a_slide_deck.md`
-- `reports/track_a/track_b_dependency_report.md`
-- `reports/track_a/model_comparison.csv`
-- `reports/track_a/statistical_tests.csv`
-- `reports/track_a/figures/`
-- `reports/track_a/models/`
-
-## Current Track A model comparison
-
-| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Logistic Regression | 0.6165 | 0.2697 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18199 | 405940 | 1939 |
-| Gradient Boosting | 0.6020 | 0.2416 | 0.2187 | 0.7743 | 0.3411 | 0.2000 | 75978 | 152719 | 271420 | 22152 |
-| Random Forest | 0.5980 | 0.2490 | 0.2179 | 0.7395 | 0.3366 | 0.5000 | 72566 | 163607 | 260532 | 25564 |
-
-## Luu y
-
-- Thu muc `dashboard/` van chua duoc dua vao luong chinh.
-- Cac file notebook cu cho feature engineering / modeling da duoc xoa de tranh conflict voi huong phat trien sau nay.
-- Track A da co workflow rieng trong `src/track_a/`; Track B chua duoc xem la phan da hoan thien.
+| model | roc_auc | pr_auc | accuracy | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6165 | 0.2698 | 0.2190 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18186 | 405953 | 1939 |
+| Gradient Boosting | 0.6010 | 0.2512 | 0.4122 | 0.2134 | 0.7922 | 0.3362 | 0.2000 | 77739 | 137555 | 286584 | 20391 |
+| Random Forest | 0.5959 | 0.2455 | 0.4519 | 0.2174 | 0.7376 | 0.3358 | 0.5000 | 72376 | 163630 | 260509 | 25754 |

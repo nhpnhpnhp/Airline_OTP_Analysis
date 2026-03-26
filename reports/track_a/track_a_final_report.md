@@ -1,41 +1,41 @@
-# Track A Final Report
+# Báo cáo cuối cùng - Track A
 
-## 1. Executive Summary
+## 1. Tóm tắt điều hành
 
-Track A focuses on pre-flight features for predicting `ARR_DEL15` with a temporal split between 2021-2024 (train) and 2025 (test). The workflow combines compact statistical analysis, leakage-aware modeling, and final reporting artifacts suitable for the course project.
+Track A tập trung vào các biến có sẵn trước chuyến bay để dự đoán `ARR_DEL15`, với cách chia thời gian 2021-2024 cho tập huấn luyện và 2025 cho tập kiểm tra. Workflow kết hợp phân tích thống kê gọn, mô hình hóa có kiểm soát rò rỉ dữ liệu và sinh bộ artifact cuối cùng phục vụ cho đồ án môn học.
 
-## 2. Experimental Setup
+## 2. Thiết lập thí nghiệm
 
-- Target: `ARR_DEL15`
-- Train period: 2021-2024
-- Test period: 2025
-- Track A features: original pre-flight and schedule-derived numeric features from the preprocessing plan
-- Modeling stack: scikit-learn estimators only
-- Leakage rule: exclude operational outcome variables such as arrival outcomes, taxi-in, wheels-on, and post-arrival delay causes
+- Biến mục tiêu: `ARR_DEL15`
+- Giai đoạn huấn luyện: 2021-2024
+- Giai đoạn kiểm tra: 2025
+- Tập đặc trưng Track A: các biến số gốc trước chuyến bay và các biến dẫn xuất từ lịch bay trong kế hoạch preprocessing
+- Bộ mô hình: chỉ dùng estimator từ `scikit-learn`
+- Quy tắc chống leakage: loại bỏ các biến phản ánh kết quả vận hành như kết quả đến, taxi-in, wheels-on và các nguyên nhân trễ sau khi hạ cánh
 
-## 3. Statistical Analysis
+## 3. Phân tích thống kê
 
-### 3.1 Chi-square Test: YEAR vs ARR_DEL15
+### 3.1 Kiểm định Chi-bình phương: YEAR và ARR_DEL15
 
-- Statistic: 31026.8233
-- Degrees of freedom: 4
+- Thống kê kiểm định: 31026.8233
+- Bậc tự do: 4
 - p-value: 0
-- Effect size (Cramers V): 0.1129
+- Kích thước hiệu ứng (Cramér's V): 0.1129
 
-Interpretation: OTP distribution differs across years, but the effect size should be read alongside business meaning rather than p-value alone because the sample is large.
+Diễn giải: phân phối OTP có khác biệt giữa các năm, nhưng cần đọc kích thước hiệu ứng cùng với ý nghĩa nghiệp vụ thay vì chỉ nhìn p-value vì cỡ mẫu rất lớn.
 
-### 3.2 Kruskal-Wallis Test: ARR_DELAY_NEW by DEP_TIME_BLK
+### 3.2 Kiểm định Kruskal-Wallis: ARR_DELAY_NEW theo DEP_TIME_BLK
 
-- Statistic: 21825.1056
-- Degrees of freedom: 18
+- Thống kê kiểm định: 21825.2461
+- Bậc tự do: 18
 - p-value: 0
-- Effect size (Epsilon squared): 0.0090
+- Kích thước hiệu ứng (Epsilon bình phương): 0.0090
 
-Interpretation: delay magnitude differs across departure time blocks, supporting time-of-day as a relevant associative factor for Track A.
+Diễn giải: mức độ trễ khác nhau giữa các khung giờ khởi hành, cho thấy thời điểm trong ngày là một yếu tố liên quan đáng chú ý đối với Track A.
 
-## 4. Comparative Association Analysis
+## 4. Phân tích liên hệ mô tả
 
-### 4.1 Top Carrier Associations
+### 4.1 Các hãng có liên hệ nổi bật
 
 | OP_CARRIER | flights | delay_rate |
 | --- | --- | --- |
@@ -50,7 +50,7 @@ Interpretation: delay magnitude differs across departure time blocks, supporting
 | NK | 86397 | 0.2270 |
 | OH | 80343 | 0.2081 |
 
-### 4.2 High-Delay Routes (min 500 flights)
+### 4.2 Các chặng có tỷ lệ trễ cao (tối thiểu 500 chuyến)
 
 | ROUTE | flights | delay_rate |
 | --- | --- | --- |
@@ -65,7 +65,7 @@ Interpretation: delay magnitude differs across departure time blocks, supporting
 | ASE-ORD | 627 | 0.3301 |
 | BOS-RSW | 968 | 0.3285 |
 
-### 4.3 Time Block Summary
+### 4.3 Tóm tắt theo khung giờ
 
 | DEP_TIME_BLK | delay_rate | avg_delay_new |
 | --- | --- | --- |
@@ -80,51 +80,51 @@ Interpretation: delay magnitude differs across departure time blocks, supporting
 | 1400-1459 | 0.2072 | 15.3326 |
 | 1300-1359 | 0.2033 | 15.1525 |
 
-These findings are descriptive associations. They support feature relevance, but they are not presented as causal driver analysis.
+Các kết quả trên chỉ mang tính mô tả và liên hệ. Chúng hỗ trợ việc chọn đặc trưng, nhưng không được trình bày như bằng chứng nhân quả.
 
-## 5. Leakage Audit and Temporal Split
+## 5. Kiểm soát leakage và chia theo thời gian
 
-- The preprocessing stage already removed forbidden leakage columns for Track A.
-- Temporal evaluation uses 2025 as a forward-looking test set, which is more realistic than a random split for OTP prediction.
-- The Track A feature set remains aligned with pre-flight availability assumptions.
+- Giai đoạn preprocessing đã loại bỏ các cột leakage không hợp lệ cho Track A.
+- Việc đánh giá trên năm 2025 phản ánh bài toán dự báo thực tế tốt hơn so với chia ngẫu nhiên.
+- Tập đặc trưng Track A vẫn bám sát giả định chỉ sử dụng thông tin có trước chuyến bay.
 
-## 6. Track A Modeling
+## 6. Mô hình hóa Track A
 
-### 6.1 Model Comparison
+### 6.1 So sánh mô hình
 
-| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Logistic Regression | 0.6165 | 0.2697 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18199 | 405940 | 1939 |
-| Gradient Boosting | 0.6020 | 0.2416 | 0.2187 | 0.7743 | 0.3411 | 0.2000 | 75978 | 152719 | 271420 | 22152 |
-| Random Forest | 0.5980 | 0.2490 | 0.2179 | 0.7395 | 0.3366 | 0.5000 | 72566 | 163607 | 260532 | 25564 |
+| model | roc_auc | pr_auc | accuracy | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6165 | 0.2698 | 0.2190 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18186 | 405953 | 1939 |
+| Gradient Boosting | 0.6010 | 0.2512 | 0.4122 | 0.2134 | 0.7922 | 0.3362 | 0.2000 | 77739 | 137555 | 286584 | 20391 |
+| Random Forest | 0.5959 | 0.2455 | 0.4519 | 0.2174 | 0.7376 | 0.3358 | 0.5000 | 72376 | 163630 | 260509 | 25754 |
 
-### 6.2 Best Model
+### 6.2 Mô hình tốt nhất
 
-The selected best model is **Logistic Regression** based on test-set discrimination and overall balance between ROC-AUC, PR-AUC, and F1.
+Mô hình được chọn là **Logistic Regression**, dựa trên khả năng phân biệt trên tập kiểm tra và sự cân bằng tổng thể giữa ROC-AUC, PR-AUC, Accuracy và F1.
 
-## 7. Permutation Importance
+## 7. Độ quan trọng hoán vị
 
 | feature | importance_drop_auc |
 | --- | --- |
-| DAY_OF_MONTH | 0.0442 |
-| DISTANCE | 0.0276 |
-| CRS_ELAPSED_TIME | 0.0248 |
-| ORIGIN_HIST_OTP | 0.0190 |
-| CRS_DEP_TIME_MIN | 0.0091 |
-| DISTANCE_GROUP | 0.0077 |
-| IS_WEEKEND | 0.0039 |
-| CRS_DEP_COS | 0.0027 |
-| CRS_ARR_COS | 0.0026 |
+| DAY_OF_MONTH | 0.0385 |
+| DISTANCE | 0.0250 |
+| CRS_ELAPSED_TIME | 0.0243 |
+| ORIGIN_HIST_OTP | 0.0209 |
+| CRS_DEP_TIME_MIN | 0.0113 |
+| DISTANCE_GROUP | 0.0074 |
+| IS_WEEKEND | 0.0036 |
+| CRS_ARR_COS | 0.0034 |
+| CRS_DEP_COS | 0.0030 |
 | DEST_FREQ | 0.0018 |
 
-Permutation importance was computed only for the selected best model to keep interpretability focused and within scope.
+Phân tích permutation importance chỉ được tính cho mô hình tốt nhất để giữ phần diễn giải ở mức tập trung và phù hợp phạm vi đồ án.
 
-## 8. Track B Dependency Note
+## 8. Ghi chú phụ thuộc với Track B
 
-Track A does not depend on Track B implementation to finish its own modeling. The only required coordination point is keeping the same target name, temporal split, and core evaluation metrics for final cross-track comparison.
+Track A không phụ thuộc vào việc Track B hoàn thiện mô hình để kết thúc phần việc riêng của mình. Điểm cần phối hợp duy nhất là giữ thống nhất tên biến mục tiêu, cách chia theo thời gian và bộ metric cốt lõi để có thể so sánh chéo ở giai đoạn cuối.
 
-## 9. Limitations and Next Steps
+## 9. Hạn chế và hướng tiếp theo
 
-- Track A uses only pre-flight information, so there is an upper limit on achievable performance.
-- The ensemble model is intentionally lightweight to keep project scope realistic.
-- Optional future work: SHAP for one boosting-style model, lightweight dashboard overview, and a side-by-side comparison once Track B is finalized.
+- Track A chỉ dùng thông tin trước chuyến bay, nên có một giới hạn tự nhiên về mức hiệu năng có thể đạt được.
+- Các mô hình ensemble được giữ ở mức gọn để phạm vi triển khai phù hợp với đồ án.
+- Hướng mở rộng tùy chọn: SHAP cho một mô hình boosting, dashboard tổng quan nhẹ và so sánh song song khi Track B hoàn thiện.

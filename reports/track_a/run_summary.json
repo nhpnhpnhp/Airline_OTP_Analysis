@@ -2,5 +2,5 @@
   "best_model": "Logistic Regression",
   "train_rows": 1913300,
   "test_rows": 522269,
-  "validation_rows": 191329
+  "validation_rows": 191330
 }

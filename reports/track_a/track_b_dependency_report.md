@@ -1,21 +1,21 @@
-# Track B Dependency Memo
+# Ghi chú phụ thuộc với Track B
 
-## What Track B must keep stable
+## Những điểm Track B cần giữ ổn định
 
-- Target name: `ARR_DEL15`
-- Temporal split: train 2021-2024, test 2025
-- Core metrics: ROC-AUC, PR-AUC, F1, confusion matrix
-- Narrative scope: associative/descriptive + predictive, not causal
+- Tên biến mục tiêu: `ARR_DEL15`
+- Cách chia theo thời gian: train 2021-2024, test 2025
+- Bộ metric cốt lõi: ROC-AUC, PR-AUC, Accuracy, F1, ma trận nhầm lẫn
+- Phạm vi diễn giải: mô tả/liên hệ + dự báo, không khẳng định nhân quả
 
-## What does not block Track A
+## Những gì không chặn tiến độ của Track A
 
-- Track B model choice
-- Track B tuning strategy
-- Track B optional interpretability work
+- Lựa chọn mô hình của Track B
+- Chiến lược tuning của Track B
+- Phần interpretability mở rộng của Track B
 
-## What could block final cross-track comparison
+## Những gì có thể làm hỏng so sánh chéo cuối kỳ
 
-- Different target definition
-- Different test year
-- Different metric definitions
-- Different artifact naming that makes comparison ambiguous
+- Khác định nghĩa biến mục tiêu
+- Khác năm kiểm tra
+- Khác cách định nghĩa metric
+- Khác quy ước đặt tên artifact khiến việc đối chiếu bị mơ hồ

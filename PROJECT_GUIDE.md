@@ -23,6 +23,7 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 - Gop nhom EDA script cu thanh `archive/exploratory/eda_overview.ipynb`
 - Chuyen `delay_analysis.ipynb` va `risk_analysis.ipynb` thanh notebook exploratory
 - Bo sung `src/track_a/` lam workflow rieng cho statistical analysis + modeling cua Track A
+- Dong bo workflow Track A theo huong uu tien dung thu vien: modeling va metrics dung `scikit-learn`, statistical tests dung `scipy`
 - Xoa notebook cu va cac file source ML/dashboard chua thuc hien
 
 ## Checklist uu tien tiep theo
@@ -54,4 +55,4 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
 ## Ghi chu
 
-`data/processed/ml_track_a/` va `data/processed/ml_track_b/` la artifact preprocessing. Trong phien ban hien tai, Track A da co them workflow modeling rieng trong `src/track_a/`, con Track B van chua duoc xem la da hoan thanh.
+`data/processed/ml_track_a/` va `data/processed/ml_track_b/` la artifact preprocessing. Trong phien ban hien tai, Track A da co workflow modeling rieng trong `src/track_a/` va la nhanh modeling hoan chinh nhat cua repo. Track B van chua duoc xem la da hoan thanh.
