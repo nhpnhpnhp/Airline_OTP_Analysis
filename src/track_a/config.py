@@ -30,12 +30,22 @@ LOGREG_CONFIG = {
     "l2": 1e-4,
 }
 
-TREE_CONFIG = {
-    "max_depth": 4,
+FOREST_CONFIG = {
+    "n_estimators": 9,
+    "max_depth": 6,
     "max_thresholds": 16,
-    "min_samples_leaf": 1_500,
-    "sample_size": 120_000,
+    "min_samples_leaf": 800,
+    "sample_size": 50_000,
+    "max_features": 6,
     "min_gain": 1e-4,
+}
+
+BOOSTING_CONFIG = {
+    "n_estimators": 24,
+    "learning_rate": 0.20,
+    "sample_size": 180_000,
+    "max_thresholds": 16,
+    "min_samples_leaf": 1_000,
 }
 
 VALIDATION_FRACTION = 0.10

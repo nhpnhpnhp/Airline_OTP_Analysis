@@ -28,6 +28,7 @@
 - Schedule/time features
 - Route and airport frequency features
 - Historical OTP features
+- Original Track A feature list only
 - No post-departure leakage
 
 ## Slide 7 - Leakage Audit
@@ -49,7 +50,8 @@
 
 ## Slide 11 - Models
 - Logistic Regression baseline
-- Lightweight tree model
+- Random Forest (scikit-learn)
+- Gradient Boosting (scikit-learn)
 
 ## Slide 12 - Evaluation Metrics
 - ROC-AUC

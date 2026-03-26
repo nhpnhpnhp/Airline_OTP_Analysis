@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+import pickle
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,10 +14,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from .config import (
+    BOOSTING_CONFIG,
     CLEAN_OPERATED_DIR,
     FEATURES,
+    FOREST_CONFIG,
     FIG_DIR,
     LOGREG_CONFIG,
     MODEL_DIR,
@@ -26,7 +33,6 @@ from .config import (
     TARGET_COL,
     TEST_PATH,
     TRAIN_PATH,
-    TREE_CONFIG,
     VALIDATION_FRACTION,
 )
 
@@ -39,6 +45,17 @@ def ensure_dirs() -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
+def json_default(value):
+    if isinstance(value, np.generic):
+        return value.item()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
+def save_pickle_model(model, path: Path) -> None:
+    with path.open("wb") as fh:
+        pickle.dump(model, fh)
+
+
 def load_track_a() -> tuple[pd.DataFrame, pd.DataFrame]:
     train = pd.read_parquet(TRAIN_PATH)
     test = pd.read_parquet(TEST_PATH)
@@ -48,6 +65,24 @@ def load_track_a() -> tuple[pd.DataFrame, pd.DataFrame]:
 def load_operated_columns() -> pd.DataFrame:
     cols = ["YEAR", "DEP_TIME_BLK", "ARR_DELAY_NEW", "ARR_DEL15", "OP_CARRIER", "ROUTE"]
     return pd.read_parquet(CLEAN_OPERATED_DIR, columns=cols, engine="pyarrow")
+
+
+def engineer_track_a_features(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    out = df[FEATURES].copy()
+    feature_names = list(out.columns)
+    return out.astype("float32"), feature_names
+
+
+def predict_positive_class(model, X: np.ndarray) -> np.ndarray:
+    if hasattr(model, "predict_proba"):
+        proba = model.predict_proba(X)
+        if proba.ndim == 2:
+            return proba[:, 1].astype(np.float32)
+        return proba.astype(np.float32)
+    if hasattr(model, "decision_function"):
+        score = model.decision_function(X)
+        return (1.0 / (1.0 + np.exp(-np.clip(score, -20, 20)))).astype(np.float32)
+    raise AttributeError("Model must implement predict_proba or decision_function")
 
 
 def regularized_gamma_q(a: float, x: float) -> float:
@@ -254,11 +289,13 @@ class TreeNode:
 
 
 class SimpleDecisionTree:
-    def __init__(self, max_depth: int, min_samples_leaf: int, max_thresholds: int, min_gain: float):
+    def __init__(self, max_depth: int, min_samples_leaf: int, max_thresholds: int, min_gain: float, max_features: int | None = None, seed: int = RANDOM_SEED):
         self.max_depth = max_depth
         self.min_samples_leaf = min_samples_leaf
         self.max_thresholds = max_thresholds
         self.min_gain = min_gain
+        self.max_features = max_features
+        self.seed = seed
 
     @staticmethod
     def gini(y: np.ndarray) -> float:
@@ -272,7 +309,10 @@ class SimpleDecisionTree:
         best_gain = 0.0
         best_feature = None
         best_threshold = None
-        for feature_idx in range(X.shape[1]):
+        feature_indices = np.arange(X.shape[1])
+        if self.max_features is not None and self.max_features < X.shape[1]:
+            feature_indices = np.sort(self.rng.choice(feature_indices, size=self.max_features, replace=False))
+        for feature_idx in feature_indices:
             values = X[:, feature_idx]
             thresholds = np.unique(np.quantile(values, np.linspace(0.05, 0.95, self.max_thresholds)))
             for threshold in thresholds:
@@ -307,6 +347,7 @@ class SimpleDecisionTree:
         return node
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "SimpleDecisionTree":
+        self.rng = np.random.default_rng(self.seed)
         self.tree_ = self.build(X, y, 0)
         return self
 
@@ -321,7 +362,177 @@ class SimpleDecisionTree:
 
     def save(self, path: Path, feature_names: list[str]) -> None:
         payload = {"feature_names": feature_names, "tree": self.tree_.to_dict()}
-        path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        path.write_text(json.dumps(payload, indent=2, default=json_default), encoding="utf-8")
+
+
+class RandomForestLite:
+    def __init__(
+        self,
+        n_estimators: int,
+        max_depth: int,
+        min_samples_leaf: int,
+        max_thresholds: int,
+        min_gain: float,
+        sample_size: int,
+        max_features: int,
+        seed: int,
+    ):
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.min_samples_leaf = min_samples_leaf
+        self.max_thresholds = max_thresholds
+        self.min_gain = min_gain
+        self.sample_size = sample_size
+        self.max_features = max_features
+        self.seed = seed
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "RandomForestLite":
+        rng = np.random.default_rng(self.seed)
+        pos_idx = np.where(y == 1)[0]
+        neg_idx = np.where(y == 0)[0]
+        self.trees_: list[SimpleDecisionTree] = []
+
+        pos_take = min(len(pos_idx), self.sample_size // 3)
+        neg_take = min(len(neg_idx), self.sample_size - pos_take)
+
+        for tree_num in range(self.n_estimators):
+            sample_idx = np.concatenate([
+                rng.choice(pos_idx, size=pos_take, replace=True),
+                rng.choice(neg_idx, size=neg_take, replace=True),
+            ])
+            rng.shuffle(sample_idx)
+            tree = SimpleDecisionTree(
+                max_depth=self.max_depth,
+                min_samples_leaf=self.min_samples_leaf,
+                max_thresholds=self.max_thresholds,
+                min_gain=self.min_gain,
+                max_features=self.max_features,
+                seed=self.seed + tree_num,
+            ).fit(X[sample_idx], y[sample_idx])
+            self.trees_.append(tree)
+        return self
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        preds = np.stack([tree.predict_proba(X) for tree in self.trees_], axis=0)
+        return preds.mean(axis=0)
+
+    def save(self, path: Path, feature_names: list[str]) -> None:
+        payload = {
+            "feature_names": feature_names,
+            "n_estimators": self.n_estimators,
+            "trees": [tree.tree_.to_dict() for tree in self.trees_],
+        }
+        path.write_text(json.dumps(payload, indent=2, default=json_default), encoding="utf-8")
+
+
+@dataclass
+class RegressionStump:
+    feature_index: int | None = None
+    threshold: float | None = None
+    left_value: float = 0.0
+    right_value: float = 0.0
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        if self.feature_index is None or self.threshold is None:
+            return np.zeros(X.shape[0], dtype=np.float32)
+        mask = X[:, self.feature_index] <= self.threshold
+        out = np.empty(X.shape[0], dtype=np.float32)
+        out[mask] = self.left_value
+        out[~mask] = self.right_value
+        return out
+
+    def to_dict(self) -> dict:
+        return {
+            "feature_index": self.feature_index,
+            "threshold": self.threshold,
+            "left_value": self.left_value,
+            "right_value": self.right_value,
+        }
+
+
+class GradientBoostingLite:
+    def __init__(
+        self,
+        n_estimators: int,
+        learning_rate: float,
+        sample_size: int,
+        max_thresholds: int,
+        min_samples_leaf: int,
+        seed: int,
+    ):
+        self.n_estimators = n_estimators
+        self.learning_rate = learning_rate
+        self.sample_size = sample_size
+        self.max_thresholds = max_thresholds
+        self.min_samples_leaf = min_samples_leaf
+        self.seed = seed
+
+    def _fit_stump(self, X: np.ndarray, residual: np.ndarray) -> RegressionStump:
+        best = RegressionStump()
+        best_loss = float("inf")
+        for feature_idx in range(X.shape[1]):
+            values = X[:, feature_idx]
+            thresholds = np.unique(np.quantile(values, np.linspace(0.05, 0.95, self.max_thresholds)))
+            for threshold in thresholds:
+                left_mask = values <= threshold
+                left_count = int(left_mask.sum())
+                right_count = len(values) - left_count
+                if left_count < self.min_samples_leaf or right_count < self.min_samples_leaf:
+                    continue
+                left_val = float(residual[left_mask].mean())
+                right_val = float(residual[~left_mask].mean())
+                pred = np.where(left_mask, left_val, right_val)
+                loss = float(((residual - pred) ** 2).mean())
+                if loss < best_loss:
+                    best_loss = loss
+                    best = RegressionStump(
+                        feature_index=feature_idx,
+                        threshold=float(threshold),
+                        left_value=left_val,
+                        right_value=right_val,
+                    )
+        return best
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "GradientBoostingLite":
+        rng = np.random.default_rng(self.seed)
+        pos_rate = np.clip(y.mean(), 1e-6, 1 - 1e-6)
+        self.base_score_ = float(np.log(pos_rate / (1 - pos_rate)))
+        logits = np.full(X.shape[0], self.base_score_, dtype=np.float32)
+        self.stumps_: list[RegressionStump] = []
+
+        pos_idx = np.where(y == 1)[0]
+        neg_idx = np.where(y == 0)[0]
+        pos_take = min(len(pos_idx), self.sample_size // 3)
+        neg_take = min(len(neg_idx), self.sample_size - pos_take)
+
+        for _ in range(self.n_estimators):
+            sample_idx = np.concatenate([
+                rng.choice(pos_idx, size=pos_take, replace=False),
+                rng.choice(neg_idx, size=neg_take, replace=False),
+            ])
+            rng.shuffle(sample_idx)
+            probs = 1.0 / (1.0 + np.exp(-np.clip(logits[sample_idx], -20, 20)))
+            residual = y[sample_idx] - probs
+            stump = self._fit_stump(X[sample_idx], residual)
+            update = stump.predict(X)
+            logits += self.learning_rate * update
+            self.stumps_.append(stump)
+        return self
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        logits = np.full(X.shape[0], self.base_score_, dtype=np.float32)
+        for stump in self.stumps_:
+            logits += self.learning_rate * stump.predict(X)
+        return 1.0 / (1.0 + np.exp(-np.clip(logits, -20, 20)))
+
+    def save(self, path: Path, feature_names: list[str]) -> None:
+        payload = {
+            "feature_names": feature_names,
+            "base_score": self.base_score_,
+            "learning_rate": self.learning_rate,
+            "stumps": [stump.to_dict() for stump in self.stumps_],
+        }
+        path.write_text(json.dumps(payload, indent=2, default=json_default), encoding="utf-8")
 
 
 def roc_auc_score_manual(y_true: np.ndarray, y_score: np.ndarray) -> float:
@@ -396,13 +607,13 @@ def best_threshold_from_validation(y_true: np.ndarray, y_prob: np.ndarray) -> tu
     return best_threshold, best_metrics
 
 
-def permutation_importance(model, X: np.ndarray, y: np.ndarray, base_metric: float, rng: np.random.Generator) -> pd.DataFrame:
+def permutation_importance(model, X: np.ndarray, y: np.ndarray, base_metric: float, rng: np.random.Generator, feature_names: list[str]) -> pd.DataFrame:
     rows = []
     X_work = X.copy()
-    for idx, feature in enumerate(FEATURES):
+    for idx, feature in enumerate(feature_names):
         original = X_work[:, idx].copy()
         rng.shuffle(X_work[:, idx])
-        shuffled_metric = roc_auc_score_manual(y, model.predict_proba(X_work))
+        shuffled_metric = roc_auc_score_manual(y, predict_positive_class(model, X_work))
         rows.append({"feature": feature, "importance_drop_auc": base_metric - shuffled_metric})
         X_work[:, idx] = original
     return pd.DataFrame(rows).sort_values("importance_drop_auc", ascending=False)
@@ -490,7 +701,8 @@ Track A focuses on pre-flight features for predicting `ARR_DEL15` with a tempora
 - Target: `ARR_DEL15`
 - Train period: 2021-2024
 - Test period: 2025
-- Track A features: pre-flight and schedule-derived numeric features only
+- Track A features: original pre-flight and schedule-derived numeric features from the preprocessing plan
+- Modeling stack: scikit-learn estimators only
 - Leakage rule: exclude operational outcome variables such as arrival outcomes, taxi-in, wheels-on, and post-arrival delay causes
 
 ## 3. Statistical Analysis
@@ -558,7 +770,7 @@ Track A does not depend on Track B implementation to finish its own modeling. Th
 ## 9. Limitations and Next Steps
 
 - Track A uses only pre-flight information, so there is an upper limit on achievable performance.
-- The tree model is intentionally lightweight to keep project scope realistic.
+- The ensemble model is intentionally lightweight to keep project scope realistic.
 - Optional future work: SHAP for one boosting-style model, lightweight dashboard overview, and a side-by-side comparison once Track B is finalized.
 """
     (REPORT_DIR / "track_a_final_report.md").write_text(report, encoding="utf-8")
@@ -595,6 +807,7 @@ def generate_slide_deck(best_model_name: str) -> None:
 - Schedule/time features
 - Route and airport frequency features
 - Historical OTP features
+- Original Track A feature list only
 - No post-departure leakage
 
 ## Slide 7 - Leakage Audit
@@ -616,7 +829,8 @@ def generate_slide_deck(best_model_name: str) -> None:
 
 ## Slide 11 - Models
 - Logistic Regression baseline
-- Lightweight tree model
+- Random Forest (scikit-learn)
+- Gradient Boosting (scikit-learn)
 
 ## Slide 12 - Evaluation Metrics
 - ROC-AUC
@@ -727,45 +941,67 @@ def main() -> None:
     for name, frame in association.items():
         frame.to_csv(REPORT_DIR / f"association_{name}.csv", index=False)
 
-    X = train_df[FEATURES].to_numpy(dtype=np.float32)
+    engineered_train, feature_names = engineer_track_a_features(train_df)
+    engineered_test, _ = engineer_track_a_features(test_df)
+
+    X = engineered_train.to_numpy(dtype=np.float32)
     y = train_df[TARGET_COL].to_numpy(dtype=np.float32)
-    X_test = test_df[FEATURES].to_numpy(dtype=np.float32)
+    X_test = engineered_test.to_numpy(dtype=np.float32)
     y_test = test_df[TARGET_COL].to_numpy(dtype=np.int8)
 
     train_idx, val_idx = stratified_validation_split(y, VALIDATION_FRACTION, rng)
     X_fit, y_fit = X[train_idx], y[train_idx]
     X_val, y_val = X[val_idx], y[val_idx].astype(np.int8)
 
-    logreg = LogisticRegressionGD(seed=RANDOM_SEED, **LOGREG_CONFIG).fit(X_fit, y_fit)
-    logreg_val = logreg.predict_proba(X_val)
-    logreg_threshold, _ = best_threshold_from_validation(y_val, logreg_val)
-    logreg_test = logreg.predict_proba(X_test)
-
-    pos_idx = np.where(y_fit == 1)[0]
-    neg_idx = np.where(y_fit == 0)[0]
-    pos_take = min(len(pos_idx), TREE_CONFIG["sample_size"] // 4)
-    neg_take = min(len(neg_idx), TREE_CONFIG["sample_size"] - pos_take)
-    tree_idx = np.concatenate([
-        rng.choice(pos_idx, size=pos_take, replace=False),
-        rng.choice(neg_idx, size=neg_take, replace=False),
+    logreg = Pipeline([
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(
+            C=1.0,
+            class_weight="balanced",
+            max_iter=max(500, LOGREG_CONFIG["epochs"] * 50),
+            random_state=RANDOM_SEED,
+        )),
     ])
-    rng.shuffle(tree_idx)
-    tree = SimpleDecisionTree(
-        max_depth=TREE_CONFIG["max_depth"],
-        min_samples_leaf=TREE_CONFIG["min_samples_leaf"],
-        max_thresholds=TREE_CONFIG["max_thresholds"],
-        min_gain=TREE_CONFIG["min_gain"],
-    ).fit(X_fit[tree_idx], y_fit[tree_idx])
-    tree_val = tree.predict_proba(X_val)
-    tree_threshold, _ = best_threshold_from_validation(y_val, tree_val)
-    tree_test = tree.predict_proba(X_test)
+    logreg.fit(X_fit, y_fit)
+    logreg_val = predict_positive_class(logreg, X_val)
+    logreg_threshold, _ = best_threshold_from_validation(y_val, logreg_val)
+    logreg_test = predict_positive_class(logreg, X_test)
+
+    forest = RandomForestClassifier(
+        n_estimators=FOREST_CONFIG["n_estimators"],
+        max_depth=FOREST_CONFIG["max_depth"],
+        min_samples_leaf=FOREST_CONFIG["min_samples_leaf"],
+        max_features=FOREST_CONFIG["max_features"],
+        bootstrap=True,
+        max_samples=min(FOREST_CONFIG["sample_size"], len(X_fit)),
+        class_weight="balanced_subsample",
+        n_jobs=1,
+        random_state=RANDOM_SEED,
+    )
+    forest.fit(X_fit, y_fit)
+    forest_val = predict_positive_class(forest, X_val)
+    forest_threshold, _ = best_threshold_from_validation(y_val, forest_val)
+    forest_test = predict_positive_class(forest, X_test)
+
+    boosting = GradientBoostingClassifier(
+        n_estimators=BOOSTING_CONFIG["n_estimators"],
+        learning_rate=BOOSTING_CONFIG["learning_rate"],
+        min_samples_leaf=BOOSTING_CONFIG["min_samples_leaf"],
+        subsample=min(1.0, BOOSTING_CONFIG["sample_size"] / len(X_fit)),
+        random_state=RANDOM_SEED,
+    )
+    boosting.fit(X_fit, y_fit)
+    boosting_val = predict_positive_class(boosting, X_val)
+    boosting_threshold, _ = best_threshold_from_validation(y_val, boosting_val)
+    boosting_test = predict_positive_class(boosting, X_test)
 
     model_rows = []
     curves = {}
     confusion = {}
     model_outputs = {
         "Logistic Regression": (logreg_test, logreg_threshold),
-        "Decision Tree": (tree_test, tree_threshold),
+        "Random Forest": (forest_test, forest_threshold),
+        "Gradient Boosting": (boosting_test, boosting_threshold),
     }
 
     for model_name, (scores, threshold) in model_outputs.items():
@@ -801,17 +1037,23 @@ def main() -> None:
     save_curve_plots(curves, confusion)
 
     best_model_name = model_table.iloc[0]["model"]
-    best_model = logreg if best_model_name == "Logistic Regression" else tree
+    best_model_lookup = {
+        "Logistic Regression": logreg,
+        "Random Forest": forest,
+        "Gradient Boosting": boosting,
+    }
+    best_model = best_model_lookup[best_model_name]
 
     sample_size = min(PERMUTATION_SAMPLE, len(X_test))
     sample_idx = rng.choice(np.arange(len(X_test)), size=sample_size, replace=False)
-    base_auc = roc_auc_score_manual(y_test[sample_idx], best_model.predict_proba(X_test[sample_idx]))
-    importance_df = permutation_importance(best_model, X_test[sample_idx].copy(), y_test[sample_idx], base_auc, rng)
+    base_auc = roc_auc_score_manual(y_test[sample_idx], predict_positive_class(best_model, X_test[sample_idx]))
+    importance_df = permutation_importance(best_model, X_test[sample_idx].copy(), y_test[sample_idx], base_auc, rng, feature_names)
     importance_df.to_csv(REPORT_DIR / "permutation_importance.csv", index=False)
     save_permutation_plot(importance_df)
 
-    logreg.save(MODEL_DIR / "logistic_regression_track_a.npz")
-    tree.save(MODEL_DIR / "decision_tree_track_a.json", FEATURES)
+    save_pickle_model(logreg, MODEL_DIR / "logistic_regression_track_a.pkl")
+    save_pickle_model(forest, MODEL_DIR / "random_forest_track_a.pkl")
+    save_pickle_model(boosting, MODEL_DIR / "gradient_boosting_track_a.pkl")
 
     generate_report(chi2_result, kruskal_result, association, model_table, best_model_name, importance_df)
     generate_slide_deck(best_model_name)

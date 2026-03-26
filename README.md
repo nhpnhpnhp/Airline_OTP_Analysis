@@ -118,7 +118,68 @@ Main outputs:
 | model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Logistic Regression | 0.6099 | 0.2633 | 0.2310 | 0.6657 | 0.3430 | 0.4400 | 65329 | 206655 | 217484 | 32801 |
-| Decision Tree | 0.5945 | 0.2278 | 0.2096 | 0.7354 | 0.3263 | 0.2400 | 72168 | 152072 | 272067 | 25962 |
+| Random Forest Lite | 0.5911 | 0.2438 | 0.2092 | 0.7960 | 0.3313 | 0.3200 | 78113 | 128858 | 295281 | 20017 |
+| Logistic Regression | 0.6099 | 0.2633 | 0.2310 | 0.6657 | 0.3430 | 0.4400 | 65329 | 206655 | 217484 | 32801 |
+| Random Forest Lite | 0.5911 | 0.2438 | 0.2092 | 0.7960 | 0.3313 | 0.3200 | 78113 | 128858 | 295281 | 20017 |
+| Gradient Boosting Lite | 0.5845 | 0.2259 | 0.2003 | 0.8627 | 0.3251 | 0.2800 | 84654 | 86144 | 337995 | 13476 |
+
+- Track A modeling branch with statistical analysis and evaluation artifacts
+- Best available Track A workflow outputs in `reports/track_a/` and `reports/track_a/models/`
+
+## Track A workflow
+
+Run the Track A analysis and modeling workflow:
+
+```bash
+python -m src.track_a.main
+```
+
+Main outputs:
+
+- `reports/track_a/track_a_final_report.md`
+- `reports/track_a/track_a_slide_deck.md`
+- `reports/track_a/track_b_dependency_report.md`
+- `reports/track_a/model_comparison.csv`
+- `reports/track_a/statistical_tests.csv`
+- `reports/track_a/figures/`
+- `reports/track_a/models/`
+
+## Current Track A model comparison
+
+| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6130 | 0.2660 | 0.1897 | 0.9918 | 0.3185 | 0.4600 | 97328 | 8384 | 415755 | 802 |
+| Random Forest Lite | 0.5942 | 0.2462 | 0.2211 | 0.6946 | 0.3354 | 0.3600 | 68162 | 184005 | 240134 | 29968 |
+| Gradient Boosting Lite | 0.5876 | 0.2388 | 0.2004 | 0.8693 | 0.3257 | 0.2800 | 85308 | 83748 | 340391 | 12822 |
+
+- Track A modeling branch with statistical analysis and evaluation artifacts
+- Best available Track A workflow outputs in `reports/track_a/` and `reports/track_a/models/`
+
+## Track A workflow
+
+Run the Track A analysis and modeling workflow:
+
+```bash
+python -m src.track_a.main
+```
+
+Main outputs:
+
+- `reports/track_a/track_a_final_report.md`
+- `reports/track_a/track_a_slide_deck.md`
+- `reports/track_a/track_b_dependency_report.md`
+- `reports/track_a/model_comparison.csv`
+- `reports/track_a/statistical_tests.csv`
+- `reports/track_a/figures/`
+- `reports/track_a/models/`
+
+## Current Track A model comparison
+
+| model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Logistic Regression | 0.6165 | 0.2697 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18199 | 405940 | 1939 |
+| Gradient Boosting | 0.6020 | 0.2416 | 0.2187 | 0.7743 | 0.3411 | 0.2000 | 75978 | 152719 | 271420 | 22152 |
+| Random Forest | 0.5980 | 0.2490 | 0.2179 | 0.7395 | 0.3366 | 0.5000 | 72566 | 163607 | 260532 | 25564 |
 
 ## Luu y
 

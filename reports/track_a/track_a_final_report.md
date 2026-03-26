@@ -9,7 +9,8 @@ Track A focuses on pre-flight features for predicting `ARR_DEL15` with a tempora
 - Target: `ARR_DEL15`
 - Train period: 2021-2024
 - Test period: 2025
-- Track A features: pre-flight and schedule-derived numeric features only
+- Track A features: original pre-flight and schedule-derived numeric features from the preprocessing plan
+- Modeling stack: scikit-learn estimators only
 - Leakage rule: exclude operational outcome variables such as arrival outcomes, taxi-in, wheels-on, and post-arrival delay causes
 
 ## 3. Statistical Analysis
@@ -93,8 +94,9 @@ These findings are descriptive associations. They support feature relevance, but
 
 | model | roc_auc | pr_auc | precision | recall | f1 | threshold | tp | tn | fp | fn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Logistic Regression | 0.6099 | 0.2633 | 0.2310 | 0.6657 | 0.3430 | 0.4400 | 65329 | 206655 | 217484 | 32801 |
-| Decision Tree | 0.5945 | 0.2278 | 0.2096 | 0.7354 | 0.3263 | 0.2400 | 72168 | 152072 | 272067 | 25962 |
+| Logistic Regression | 0.6165 | 0.2697 | 0.1916 | 0.9802 | 0.3205 | 0.4800 | 96191 | 18199 | 405940 | 1939 |
+| Gradient Boosting | 0.6020 | 0.2416 | 0.2187 | 0.7743 | 0.3411 | 0.2000 | 75978 | 152719 | 271420 | 22152 |
+| Random Forest | 0.5980 | 0.2490 | 0.2179 | 0.7395 | 0.3366 | 0.5000 | 72566 | 163607 | 260532 | 25564 |
 
 ### 6.2 Best Model
 
@@ -104,16 +106,16 @@ The selected best model is **Logistic Regression** based on test-set discriminat
 
 | feature | importance_drop_auc |
 | --- | --- |
-| DAY_OF_MONTH | 0.0351 |
-| ORIGIN_HIST_OTP | 0.0142 |
-| CARRIER_HIST_OTP | 0.0039 |
-| CRS_DEP_SIN | 0.0029 |
-| CRS_ARR_SIN | 0.0020 |
-| IS_WEEKEND | 0.0010 |
-| CRS_DEP_TIME_MIN | 0.0009 |
-| ROUTE_FREQ | 0.0003 |
-| DEST_FREQ | 0.0003 |
-| CRS_DEP_COS | 0.0002 |
+| DAY_OF_MONTH | 0.0442 |
+| DISTANCE | 0.0276 |
+| CRS_ELAPSED_TIME | 0.0248 |
+| ORIGIN_HIST_OTP | 0.0190 |
+| CRS_DEP_TIME_MIN | 0.0091 |
+| DISTANCE_GROUP | 0.0077 |
+| IS_WEEKEND | 0.0039 |
+| CRS_DEP_COS | 0.0027 |
+| CRS_ARR_COS | 0.0026 |
+| DEST_FREQ | 0.0018 |
 
 Permutation importance was computed only for the selected best model to keep interpretability focused and within scope.
 
@@ -124,5 +126,5 @@ Track A does not depend on Track B implementation to finish its own modeling. Th
 ## 9. Limitations and Next Steps
 
 - Track A uses only pre-flight information, so there is an upper limit on achievable performance.
-- The tree model is intentionally lightweight to keep project scope realistic.
+- The ensemble model is intentionally lightweight to keep project scope realistic.
 - Optional future work: SHAP for one boosting-style model, lightweight dashboard overview, and a side-by-side comparison once Track B is finalized.
