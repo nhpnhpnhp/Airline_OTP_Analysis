@@ -33,9 +33,8 @@ Airline_OTP_Analysis/
 |       `-- ml_track_b/
 |-- reports/
 |   |-- figures/
-|   `-- quality_report.md
+|   `-- processing.ipynb
 |-- src/
-|   |-- step1_data_cleaning/
 |   |-- track_a.ipynb
 |   `-- track_b.ipynb
 |-- PROJECT_GUIDE.md
@@ -45,11 +44,16 @@ Airline_OTP_Analysis/
 
 ## Luong chay chinh
 
-### 1. Preprocessing
+### 1. Preprocessing notebook
 
-```bash
-python -m src.step1_data_cleaning.main
-```
+Mo va chay `reports/processing.ipynb`.
+
+Notebook nay:
+
+- Cho phep chinh input files, chunksize, target, output dir
+- Chay toan bo preprocessing tu raw CSV
+- Chay acceptance checks
+- Hien cac bang thong ke de tu viet bao cao
 
 Output chinh:
 
@@ -58,7 +62,6 @@ Output chinh:
 - `data/processed/mappings/`
 - `data/processed/ml_track_a/`
 - `data/processed/ml_track_b/`
-- `reports/quality_report.md`
 
 ### 2. Track A notebook
 
@@ -81,5 +84,5 @@ Mo va chay `src/track_b.ipynb`.
 ## Ghi chu
 
 - `reports/track_a/` da duoc loai bo vi do la bo bao cao cu sinh tu workflow Track A truoc day.
-- Hien tai Track A va Track B deu duoc trinh bay theo huong notebook de de tu viet bao cao sau.
+- Hien tai preprocessing, Track A va Track B deu duoc trinh bay theo huong notebook de de tu viet bao cao sau.
 - `data/processed/ml_track_a/` va `data/processed/ml_track_b/` van la artifact preprocessing chinh cho modeling.

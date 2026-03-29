@@ -18,7 +18,7 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
 ## Trang thai repo sau khi don dep
 
-- Giu `src/step1_data_cleaning/main.py` lam diem vao preprocessing chinh
+- Giu `reports/processing.ipynb` lam workflow preprocessing chinh
 - Gop nhom EDA script cu thanh notebook exploratory
 - Giu `src/track_a.ipynb` va `src/track_b.ipynb` lam notebook modeling
 - Xoa workflow Track A cu trong `src/track_a/`
