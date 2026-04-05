@@ -8,7 +8,7 @@ Phien ban repo hien tai duoc chot scope nhu sau:
 2. Tao processed datasets va quality report
 3. Gom EDA thanh notebook exploratory
 4. Giu cac notebook phan tich thu nghiem trong `archive/exploratory/`
-5. Duy tri notebook modeling rieng cho Track A va Track B trong `src/`
+5. Duy tri notebook modeling rieng cho Track A va Track B trong `code/`
 
 Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
@@ -20,8 +20,8 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
 - Giu `reports/processing.ipynb` lam workflow preprocessing chinh
 - Gop nhom EDA script cu thanh notebook exploratory
-- Giu `src/track_a.ipynb` va `src/track_b.ipynb` lam notebook modeling
-- Xoa workflow Track A cu trong `src/track_a/`
+- Giu `code/track_a.ipynb` va `code/track_b.ipynb` lam notebook modeling
+- Xoa workflow Track A cu trong `code/track_a/`
 - Xoa bao cao cu trong `reports/track_a/`
 
 ## Checklist uu tien tiep theo
@@ -39,7 +39,7 @@ Nhung phan sau duoc xem la chua bat dau hoac chua dua vao scope chinh:
 
 ## Quy uoc to chuc file
 
-- Official source: `src/`
+- Official source: `code/`
 - Exploratory notebooks: `archive/exploratory/`
 - Bao cao: `reports/`
 - Du lieu raw/processed: `data/`

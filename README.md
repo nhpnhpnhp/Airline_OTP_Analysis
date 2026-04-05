@@ -9,7 +9,7 @@ Repo hien tap trung vao 4 phan da co artifact ro rang:
 - Thu thap va to chuc du lieu raw BTS cho 2021-2025
 - Tien xu ly va lam sach du lieu thanh cac tap parquet phan vung
 - Exploratory analysis va risk analysis trong `archive/exploratory/`
-- Notebook modeling cho Track A va Track B trong `src/`
+- Notebook modeling cho Track A va Track B trong `code/`
 
 Nhung phan chua duoc xem la hoan thien:
 
@@ -34,7 +34,7 @@ Airline_OTP_Analysis/
 |-- reports/
 |   |-- figures/
 |   `-- processing.ipynb
-|-- src/
+|-- code/
 |   |-- track_a.ipynb
 |   `-- track_b.ipynb
 |-- PROJECT_GUIDE.md
@@ -65,7 +65,7 @@ Output chinh:
 
 ### 2. Track A notebook
 
-Mo va chay `src/track_a.ipynb`.
+Mo va chay `code/track_a.ipynb`.
 
 Notebook nay hien:
 
@@ -79,7 +79,7 @@ Notebook nay hien:
 
 ### 3. Track B notebook
 
-Mo va chay `src/track_b.ipynb`.
+Mo va chay `code/track_b.ipynb`.
 
 ## Ghi chu
 
